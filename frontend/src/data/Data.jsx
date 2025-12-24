@@ -35,31 +35,30 @@ const getJsonFromPinata = async (cid) => {
     }
 }
 
-const generateTimeline = (stateIndex, currentOwnerName) => {
+const generateTimeline = async (role, logs) => {
   const states = [
-    { label: "Manufacturing", icon: "droplet", owner: "Manufacturer" },
-    { label: "QC_Passed", icon: "dollar", owner: "Quality Control" },
-    { label: "Packaged", icon: "package", owner: "Packaging Unit" },
-    { label: "AtDistributor", icon: "truck", owner: "Distributor" },
-    { label: "AtRetailer", icon: "funnel", owner: "Retailer" },
-    { label: "Sold", icon: "leaf", owner: "Consumer" },
+    { label: "Manufacturing", icon: "droplet" },
+    { label: "Quality Check Passed", icon: "dollar" },
+    { label: "Packaged", icon: "package" },
+    { label: "At Distributor", icon: "truck" },
+    { label: "At Retailer", icon: "funnel" },
+    { label: "Sold", icon: "leaf" },
   ];
 
-
   let history = [];
-  const maxIndex = stateIndex - 1; 
-
-  if (stateIndex > 0) {
-    for (let i = 0; i <= maxIndex && i < states.length; i++) {
+  for (let i = 0; i < logs.length && i < states.length; i++) {
+      const state_id = Number(logs[i].args[1]);
+      const from = await role.getParticipant(logs[i].args[2]);
+      const to = logs[i].args[3] === ethers.ZeroAddress ? ["Sold"] : await role.getParticipant(logs[i].args[3]);
+      const date = new Date(Number(logs[i].args[4]) * 1000);
       history.push({
-        status: states[i].label,
-        date: i === maxIndex ? "Current Stage" : "Completed",
-        ownerCode: i === maxIndex ? currentOwnerName : "Passed",
-        ownerName: i === maxIndex ? currentOwnerName : states[i].owner,
+        status: states[state_id - 1].label,
+        date: date.toLocaleDateString(),
+        ownerName: from[0],
+        nextOwner: to[0],
         icon: states[i].icon,
       });
     }
-  }
   return history;
 };
 
@@ -78,21 +77,27 @@ export const fetchBlockchainProduct = async (code) => {
       provider
     );
 
-    // console.log(
-    //   `Calling Smart Contract at ${SUPPLY_CHAIN_ADDRESS} for ID: ${code}`
-    // );
+    console.log(
+      `Calling Smart Contract at ${SUPPLY_CHAIN_ADDRESS} for ID: ${code}`
+    );
 
-    let id = code;
+    //convert product code to id
+    let id = code; //this is for debug only
     try {
       id = await contract.getIdFromCode(code);
     } catch (err) {}
 
+    //get product state update logs and data
+    const filter = contract.filters.UpdateProductState(id);
+    const logs = await contract.queryFilter(filter);
+    // console.log(await generateTimeline(role, logs));
     const productRaw = await contract.getProductInfo(id);
     if (!productRaw[1]) {
       throw new Error("Product not found or empty data returned.");
     }
     // console.log(productRaw);
 
+    //get participant
     let participantName = "Unknown";
     let participantRole = "Unknown";
     if (productRaw[2] && productRaw[2] !== ethers.ZeroAddress) {
@@ -133,7 +138,8 @@ export const fetchBlockchainProduct = async (code) => {
       expire: jsonObj.exp,
       storage_condition: jsonObj.storage_condition,
       batch_num: jsonObj.batch_number,
-      timeline: generateTimeline(Number(productRaw[3]), participantName),
+      timeline: await generateTimeline(role, logs),
+      timestamp: Number(productRaw[5]),
     };
   } catch (error) {
     console.error(error);

@@ -50,7 +50,7 @@ const ProductDetails = ({ data }) => {
             <DetailRow icon={Globe} label="Origin" value={data.origin} />
             <DetailRow
               icon={Calendar}
-              label="Expiry Date"
+              label="Expiry Date (months from the date of manufacture)"
               value={data.expire}
             />
             <DetailRow
@@ -63,7 +63,7 @@ const ProductDetails = ({ data }) => {
         <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 rounded-full bg-blue-50 opacity-50 z-0"></div>
       </div>
 
-      <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+      {/* <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
         <h3 className="font-bold text-lg text-slate-900 mb-4 flex items-center border-b pb-3">
           <User className="w-5 h-5 mr-2 text-blue-600" />
           Current Custodian
@@ -87,7 +87,7 @@ const ProductDetails = ({ data }) => {
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };

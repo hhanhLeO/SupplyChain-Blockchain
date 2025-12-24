@@ -28,7 +28,7 @@ const IconMapper = ({ type, className }) => {
 };
 
 const Timeline = ({ item, isLast }) => {
-  const participant = { name: item.ownerCode };
+  const participant = { from: item.ownerName, to: item.nextOwner };
   
   return (
     <div className="flex group animate-in slide-in-from-left-4 duration-500" style={{ animationDelay: `${isLast ? 300 : 100}ms` }}>
@@ -39,11 +39,11 @@ const Timeline = ({ item, isLast }) => {
         {!isLast && <div className="w-0.5 h-full bg-slate-200 -mt-2 -mb-2 group-hover:bg-blue-200" />}
       </div>
       <div className="pb-8 pt-2">
-        <h3 className="font-bold text-slate-800 text-lg">{item.status.replace(/_/g, ' ')}</h3>
+        <h3 className="font-bold text-slate-800 text-lg">{item.status}</h3>
         <p className="text-slate-500 text-xs font-mono">{item.date}</p>
         <div className="mt-1 flex items-center text-sm text-blue-800 bg-blue-50 w-fit px-2 py-1 rounded">
-            <Building2 className="w-3 h-3 mr-1" />
-            <span className="font-semibold mr-2">{participant.name}</span>
+            <Building2 className="w-3 h-3 mx-2" />
+            <span className="font-semibold mr-2">{participant.to}</span>
         </div>
       </div>
     </div>

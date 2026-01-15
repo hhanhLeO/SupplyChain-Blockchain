@@ -1,4 +1,4 @@
-# Supply Chain - Tracking
+# Supply Chain - Blockchain
 
 ## Prerequisites
 Make sure you have the following installed on your machine:
@@ -102,4 +102,14 @@ npm install
 ```bash
 npm run build
 npm start
+```
+
+### Testing with data
+- After the application has finished running, you can use the following link to retrieve test data for the application:
+```
+# Test with raw ID
+https://drive.google.com/drive/folders/1CpvbmuYrgOgmQ4C5fwiTe5sErIVyAp_N
+
+# Test with QR code
+https://drive.google.com/drive/folders/1CG9V74Wiv3grPN5lPPEUb6-LhY1yHQl8
 ```
